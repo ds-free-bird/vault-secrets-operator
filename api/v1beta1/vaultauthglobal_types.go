@@ -28,7 +28,7 @@ type VaultAuthGlobalSpec struct {
 	// auth methods.
 	DefaultVaultNamespace string `json:"defaultVaultNamespace,omitempty"`
 	// DefaultAuthMethod to use when authenticating to Vault.
-	// +kubebuilder:validation:Enum=kubernetes;jwt;appRole;aws;gcp
+	// +kubebuilder:validation:Enum=kubernetes;jwt;appRole;aws;gcp;token
 	DefaultAuthMethod string `json:"defaultAuthMethod,omitempty"`
 	// DefaultMount to use when authenticating to auth method. If not specified the mount of
 	// the auth method configured in Vault will be used.
@@ -47,6 +47,8 @@ type VaultAuthGlobalSpec struct {
 	AWS *VaultAuthGlobalConfigAWS `json:"aws,omitempty"`
 	// GCP specific auth configuration, requires that Method be set to `gcp`.
 	GCP *VaultAuthGlobalConfigGCP `json:"gcp,omitempty"`
+	// Token specific auth configuration, requires that Method be set to `token`.
+	Token *VaultAuthGlobalConfigToken `json:"token,omitempty"`
 }
 
 // VaultAuthGlobalStatus defines the observed state of VaultAuthGlobal
@@ -127,6 +129,18 @@ type VaultAuthGlobalConfigAWS struct {
 
 type VaultAuthGlobalConfigGCP struct {
 	VaultAuthConfigGCP `json:",inline"`
+	// Namespace to auth to in Vault
+	Namespace string `json:"namespace,omitempty"`
+	// Mount to use when authenticating to auth method.
+	Mount string `json:"mount,omitempty"`
+	// Params to use when authenticating to Vault
+	Params map[string]string `json:"params,omitempty"`
+	// Headers to be included in all Vault requests.
+	Headers map[string]string `json:"headers,omitempty"`
+}
+
+type VaultAuthGlobalConfigToken struct {
+	VaultAuthConfigToken `json:",inline"`
 	// Namespace to auth to in Vault
 	Namespace string `json:"namespace,omitempty"`
 	// Mount to use when authenticating to auth method.

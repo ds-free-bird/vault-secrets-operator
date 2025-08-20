@@ -24,6 +24,7 @@ var ProviderMethodsSupported = []string{
 	consts.ProviderMethodAppRole,
 	consts.ProviderMethodAWS,
 	consts.ProviderMethodGCP,
+	consts.ProviderMethodToken,
 	hcp.ProviderMethodServicePrincipal,
 }
 
@@ -45,6 +46,8 @@ func NewCredentialProvider(ctx context.Context, client client.Client, obj client
 			prov = &vault.AWSCredentialProvider{}
 		case consts.ProviderMethodGCP:
 			prov = &vault.GCPCredentialProvider{}
+		case consts.ProviderMethodToken:
+			prov = &vault.TokenCredentialProvider{}
 		default:
 			return nil, fmt.Errorf("unsupported authentication method %s", authObj.Spec.Method)
 		}

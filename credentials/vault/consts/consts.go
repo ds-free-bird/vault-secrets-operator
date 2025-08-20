@@ -6,9 +6,11 @@ package consts
 const (
 	ProviderSecretKeyAppRole = "id"
 	ProviderSecretKeyJWT     = "jwt"
+	ProviderSecretKeyToken   = "token"
 	ProviderMethodKubernetes = "kubernetes"
 	ProviderMethodJWT        = "jwt"
 	ProviderMethodAppRole    = "appRole"
 	ProviderMethodAWS        = "aws"
 	ProviderMethodGCP        = "gcp"
+	ProviderMethodToken      = "token"
 )

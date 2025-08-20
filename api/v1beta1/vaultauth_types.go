@@ -272,6 +272,41 @@ type VaultAuthConfigGCP struct {
 	ProjectID string `json:"projectID,omitempty"`
 }
 
+// VaultAuthConfigToken provides configuration for static Vault token authentication
+type VaultAuthConfigToken struct {
+	// FilePath is the path to a local file containing the static Vault token.
+	// The file should contain only the token value.
+	FilePath string `json:"filePath,omitempty"`
+}
+
+// Merge merges the other VaultAuthConfigToken into a copy of the current. If the
+// current value is empty, it will be replaced by the other value. If the merger
+// is successful, the copy is returned.
+func (a *VaultAuthConfigToken) Merge(other *VaultAuthConfigToken) (*VaultAuthConfigToken, error) {
+	c := &VaultAuthConfigToken{
+		FilePath: a.FilePath,
+	}
+	if c.FilePath == "" {
+		c.FilePath = other.FilePath
+	}
+
+	if err := c.Validate(); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+// Validate checks that the VaultAuthConfigToken is valid. All validation errors
+// are returned.
+func (a *VaultAuthConfigToken) Validate() error {
+	var errs error
+	if a.FilePath == "" {
+		errs = errors.Join(fmt.Errorf("empty filePath"))
+	}
+
+	return errs
+}
+
 // Merge merges the other VaultAuthConfigGCP into a copy of the current. If the
 // current value is empty, it will be replaced by the other value. If the merger
 // is successful, the copy is returned.
@@ -399,7 +434,7 @@ type VaultAuthSpec struct {
 	// is the default behavior.
 	AllowedNamespaces []string `json:"allowedNamespaces,omitempty"`
 	// Method to use when authenticating to Vault.
-	// +kubebuilder:validation:Enum=kubernetes;jwt;appRole;aws;gcp
+	// +kubebuilder:validation:Enum=kubernetes;jwt;appRole;aws;gcp;token
 	Method string `json:"method,omitempty"`
 	// Mount to use when authenticating to auth method.
 	Mount string `json:"mount,omitempty"`
@@ -417,6 +452,9 @@ type VaultAuthSpec struct {
 	AWS *VaultAuthConfigAWS `json:"aws,omitempty"`
 	// GCP specific auth configuration, requires that Method be set to `gcp`.
 	GCP *VaultAuthConfigGCP `json:"gcp,omitempty"`
+	// Token specific auth configuration, requires that Method be set to `token`.
+	// The referenced file path must be accessible to the operator.
+	Token *VaultAuthConfigToken `json:"token,omitempty"`
 	// StorageEncryption provides the necessary configuration to encrypt the client storage cache.
 	// This should only be configured when client cache persistence with encryption is enabled.
 	// This is done by passing setting the manager's commandline argument
